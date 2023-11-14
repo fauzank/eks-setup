@@ -295,6 +295,22 @@ helm install -n kube-system secrets-provider-aws aws-secrets-manager/secrets-sto
 https://github.com/kubernetes-sigs/secrets-store-csi-driver/blob/221ef44211750661b2407e608ff707517d7a940a/charts/secrets-store-csi-driver/values.yaml
 
 
+# Clean Up
+
+
+```
+Delete all services and deployments
+
+eksctl delete iamserviceaccount \
+  --cluster=demo-eks-cluster \
+  --namespace=kube-system \
+  --name=aws-load-balancer-controller
+
+delete-policy --policy-name AWSLoadBalancerControllerIAMPolicy
+    
+eksctl delete cluster -f config.yaml --disable-nodegroup-eviction
+```
+
 
 
 
