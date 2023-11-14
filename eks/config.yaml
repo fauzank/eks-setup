@@ -1,0 +1,51 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: demo-eks-cluster
+  region: us-east-1
+  version: "1.28"
+
+
+vpc:
+  id: "vpc-0e5883071d4fc48a0"  
+  subnets:
+    private:
+      us-east-1a:
+        id: "subnet-0915e4f2480bbdf97"
+      us-east-1b:
+        id: "subnet-07a43bedf238436ab"
+
+managedNodeGroups:
+  - name: data-plane
+    instanceType: t3.medium
+    desiredCapacity: 2
+    volumeSize: 50
+    privateNetworking: true
+
+cloudWatch:
+  clusterLogging:
+    # enable specific types of cluster control plane logs
+    enableTypes: [ "*" ]
+    # all supported types: "api", "audit", "authenticator", "controllerManager", "scheduler"
+    # supported special values: "*" and "all"
+
+    # Sets the number of days to retain the logs for (see [CloudWatch docs](https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_PutRetentionPolicy.html#API_PutRetentionPolicy_RequestSyntax)).
+    # By default, log data is stored in CloudWatch Logs indefinitely.
+    logRetentionInDays: 30
+
+iam:
+  withOIDC: true
+
+addons:
+- name: vpc-cni
+  # all below properties are optional
+  version: '1.15.1'
+  attachPolicyARNs:
+  - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+- name: coredns
+  version: latest # auto discovers the latest available
+- name: kube-proxy
+  version: latest
+- name: aws-ebs-csi-driver
+  wellKnownPolicies:      # add IAM and service account
+    ebsCSIController: true

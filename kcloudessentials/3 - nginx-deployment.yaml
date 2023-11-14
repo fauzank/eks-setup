@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: production
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      serviceAccountName: nginx
+      containers:
+        - name: nginx
+          image: nginx
+          env:
+            - name: API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: nginxsecrets
+                  key: NGINX_API_TOKEN
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: secrets-store-inline
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+      volumes:
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "nginx-deployment-aws-secrets"
+              

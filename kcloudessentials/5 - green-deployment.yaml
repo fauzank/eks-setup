@@ -1,0 +1,25 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: green-app
+  namespace: production
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: green
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: green
+    spec:
+      containers:
+        - name: green-app
+          image: hashicorp/http-echo
+          args:
+            - "-text=Green App"
+          ports:
+            - containerPort: 8080
+
+              
